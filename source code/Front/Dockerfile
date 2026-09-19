@@ -23,18 +23,20 @@ RUN npm run build
 FROM nginx:1.27-alpine AS runtime
 
 RUN apk add --no-cache curl \
-    && rm -f /etc/nginx/conf.d/default.conf
+    && rm -f /etc/nginx/conf.d/default.conf \
+    && touch /run/nginx.pid \
+    && chown -R nginx:nginx \
+        /run/nginx.pid \
+        /var/cache/nginx \
+        /usr/share/nginx/html \
+        /etc/nginx/conf.d
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# nginx official image supports non-root variants poorly when binding to 80,
-# so use unprivileged port 8080 and explicitly run as nginx.
 RUN chown -R nginx:nginx \
     /usr/share/nginx/html \
-    /var/cache/nginx \
-    /var/run \
     /etc/nginx/conf.d
 
 USER nginx

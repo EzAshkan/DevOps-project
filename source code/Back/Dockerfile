@@ -1,52 +1,36 @@
-# =========================
-# Stage 1: dependency builder
-# =========================
-FROM python:3.12-slim AS builder
+FROM python:3.12-slim
 
-ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
+# Python/container runtime settings
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_NO_CACHE_DIR=1
 
-WORKDIR /build
+WORKDIR /app
 
+# Install curl for Docker HEALTHCHECK
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install dependencies separately for better Docker layer caching
 COPY requirements.txt .
 
 RUN pip install --upgrade pip \
-    && pip wheel --no-cache-dir --wheel-dir /wheels -r requirements.txt
+    && pip install --no-cache-dir -r requirements.txt
 
+# Copy backend source
+COPY . /app/Back
 
-# =========================
-# Stage 2: runtime
-# =========================
-FROM python:3.12-slim AS runtime
-
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
-
-# curl for HEALTHCHECK
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl \
-    && rm -rf /var/lib/apt/lists/* \
-    && groupadd --gid 10001 app \
+# Create and use a non-root user
+RUN groupadd --gid 10001 app \
     && useradd \
        --uid 10001 \
        --gid app \
        --shell /usr/sbin/nologin \
        --create-home \
-       app
-
-WORKDIR /app
-
-COPY --from=builder /wheels /wheels
-COPY requirements.txt .
-
-RUN pip install --no-cache-dir /wheels/* \
-    && rm -rf /wheels
-
-# چون Back یک Python package است، parent directory لازم است
-COPY . /app/Back
-
-RUN chown -R app:app /app
+       app \
+    && chown -R app:app /app
 
 USER app
 
