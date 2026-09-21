@@ -2,12 +2,16 @@
 
 Application layer of the DevOps Bootcamp final project.
 
+Repository, team, local-development, and infrastructure guidance is in [docs/](docs/), including the [shared Forogh server record](docs/infrastructure/shared-forogh-server.md).
+
+For Ubuntu setup and the verified local commands, see [Local development](docs/local-development.md).
+
 | Component | Technology | Location |
 |-----------|------------|----------|
-| Backend   | Python 3.11+ / FastAPI / SQLAlchemy | `source code/Back` |
+| Backend   | Python 3.11+ / FastAPI / SQLAlchemy | `backend/` |
 | Database  | PostgreSQL | – |
 | Cache     | Redis (optional at runtime, degrades gracefully) | – |
-| Frontend  | React 18 + Vite, plain CSS | `source code/Front` |
+| Frontend  | React 18 + Vite, plain CSS | `frontend/` |
 
 ```
 Browser ──► Frontend (static files, e.g. Nginx) ──/api/*──► Backend (FastAPI :8000) ──► PostgreSQL
@@ -43,12 +47,12 @@ Secrets (`DATABASE_URL`, `REDIS_PASSWORD`) are never logged or returned by the A
 
 ### Run locally
 
-The backend is a Python package (`Back`) using relative imports, so run it from the `source code` directory:
+The backend uses relative imports. Run it from the repository root as the `backend` package:
 
 ```bash
-pip install -r requirements.txt
-cd "source code"
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/tasks REDIS_HOST=localhost uvicorn Back.main:app --host 0.0.0.0 --port 8000
+python -m pip install -r backend/requirements.txt
+export DATABASE_URL="postgresql://taskflow:taskflow_dev_password@localhost:5432/tasks"
+python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
 ```
 
 Tables are created automatically on startup. Databases created by the previous
@@ -62,7 +66,7 @@ Tests use a temporary SQLite database and no Redis, so no infrastructure is need
 
 ```bash
 pip install -r requirements-dev.txt
-cd "source code/Back"
+cd backend
 ruff check .
 python -m pytest
 ```
@@ -119,7 +123,7 @@ readinessProbe:
 ## Frontend
 
 ```bash
-cd "source code/Front"
+cd frontend
 npm ci            # or npm install
 npm run dev       # http://localhost:3000, proxies /api to BACKEND_URL (default http://localhost:8000)
 npm run lint
@@ -147,4 +151,3 @@ Serving the production build (e.g. with Nginx) needs two things:
 ## Project
 
 Developed for **Hamrah Academy DevOps Bootcamp**.
-
