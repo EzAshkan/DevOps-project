@@ -2,7 +2,7 @@
 
 Application layer of the DevOps Bootcamp final project.
 
-Repository, team, and local-development guidance is in [docs/](docs/).
+Repository, team, local-development, and infrastructure guidance is in [docs/](docs/), including the [shared Forogh server record](docs/infrastructure/shared-forogh-server.md).
 
 | Component | Technology | Location |
 |-----------|------------|----------|
