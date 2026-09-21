@@ -1,0 +1,132 @@
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: taskflow-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    networks:
+      - backend-network
+
+
+  redis:
+    image: redis:7-alpine
+    container_name: taskflow-redis
+    restart: unless-stopped
+
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --requirepass
+      - ${REDIS_PASSWORD}
+
+    volumes:
+      - redis_data:/data
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "redis-cli",
+          "-a",
+          "${REDIS_PASSWORD}",
+          "ping"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    networks:
+      - backend-network
+
+
+  backend:
+    build:
+      context: "./Back"
+      dockerfile: Dockerfile
+
+    container_name: taskflow-backend
+    restart: unless-stopped
+
+    environment:
+      DATABASE_URL: >-
+        postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_DB: 0
+
+      CACHE_TTL_SECONDS: 60
+
+      DB_CONNECT_RETRIES: 10
+      DB_CONNECT_RETRY_DELAY: 3
+
+      LOG_LEVEL: INFO
+      APP_VERSION: ${APP_VERSION:-1.0.0}
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+      redis:
+        condition: service_healthy
+
+    networks:
+      - backend-network
+      - frontend-network
+
+
+  frontend:
+    build:
+      context: "./Front"
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: /api
+
+    container_name: taskflow-frontend
+    restart: unless-stopped
+
+    ports:
+      - "8080:8080"
+
+    depends_on:
+      backend:
+        condition: service_healthy
+
+    networks:
+      - frontend-network
+
+
+volumes:
+  postgres_data:
+  redis_data:
+
+
+networks:
+
+  frontend-network:
+    driver: bridge
+
+  backend-network:
+    driver: bridge
+    internal: true

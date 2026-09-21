@@ -1,7 +1,12 @@
 import logging
 import socket
 import time
+import logging
+import socket
+import time
+import uuid
 from contextlib import asynccontextmanager
+from .logging_config import configure_logging
 
 from fastapi import APIRouter, FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
@@ -15,10 +20,7 @@ from .database import check_database, init_db
 from .routers import tasks
 from .schemas import HealthResponse
 
-logging.basicConfig(
-    level=settings.log_level,
-    format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
-)
+configure_logging(settings.log_level)
 logger = logging.getLogger("app")
 
 INSTANCE = socket.gethostname()  # pod name in Kubernetes - handy to demo load balancing
@@ -52,19 +54,67 @@ if settings.cors_origins:
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     started = time.perf_counter()
-    response = await call_next(request)
-    duration_ms = (time.perf_counter() - started) * 1000
-    # Probe requests are frequent; keep them out of the INFO log
-    level = logging.DEBUG if "/health" in request.url.path else logging.INFO
-    logger.log(
-        level,
-        "%s %s -> %d (%.1f ms)",
-        request.method,
-        request.url.path,
-        response.status_code,
-        duration_ms,
+
+    correlation_id = (
+        request.headers.get("X-Correlation-ID")
+        or str(uuid.uuid4())
     )
-    return response
+
+    request.state.correlation_id = correlation_id
+
+    try:
+        response = await call_next(request)
+
+        duration_ms = round(
+            (time.perf_counter() - started) * 1000,
+            2,
+        )
+
+        response.headers["X-Correlation-ID"] = correlation_id
+
+        level = (
+            logging.DEBUG
+            if "/health" in request.url.path
+            else logging.INFO
+        )
+
+        logger.log(
+            level,
+            "HTTP request completed",
+            extra={
+                "log_type": "response",
+                "correlation_id": correlation_id,
+                "protocol": "http",
+                "method": request.method,
+                "endpoint": request.url.path,
+                "status": response.status_code,
+                "duration_ms": duration_ms,
+                "instance": INSTANCE,
+            },
+        )
+
+        return response
+
+    except Exception:
+        duration_ms = round(
+            (time.perf_counter() - started) * 1000,
+            2,
+        )
+
+        logger.exception(
+            "Unhandled request exception",
+            extra={
+                "log_type": "exception",
+                "correlation_id": correlation_id,
+                "protocol": "http",
+                "method": request.method,
+                "endpoint": request.url.path,
+                "duration_ms": duration_ms,
+                "instance": INSTANCE,
+            },
+        )
+
+        raise
 
 
 # ---------------------------------------------------------------------------
