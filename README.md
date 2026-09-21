@@ -4,6 +4,8 @@ Application layer of the DevOps Bootcamp final project.
 
 Repository, team, local-development, and infrastructure guidance is in [docs/](docs/), including the [shared Forogh server record](docs/infrastructure/shared-forogh-server.md).
 
+For Ubuntu setup and the verified local commands, see [Local development](docs/local-development.md).
+
 | Component | Technology | Location |
 |-----------|------------|----------|
 | Backend   | Python 3.11+ / FastAPI / SQLAlchemy | `backend/` |
@@ -45,12 +47,12 @@ Secrets (`DATABASE_URL`, `REDIS_PASSWORD`) are never logged or returned by the A
 
 ### Run locally
 
-The backend is a Python package (`Back`) using relative imports, so run it from the `backend` directory:
+The backend uses relative imports. Run it from the repository root as the `backend` package:
 
 ```bash
-pip install -r backend/requirements.txt
-cd backend
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/tasks REDIS_HOST=localhost uvicorn Back.main:app --host 0.0.0.0 --port 8000
+python -m pip install -r backend/requirements.txt
+export DATABASE_URL="postgresql://taskflow:taskflow_dev_password@localhost:5432/tasks"
+python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
 ```
 
 Tables are created automatically on startup. Databases created by the previous

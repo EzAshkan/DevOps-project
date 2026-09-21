@@ -27,4 +27,4 @@ The original source layout used `source code/` with `Back` and `Front`. It was r
 └── README.md
 ```
 
-The package name inside `backend/` remains `Back`. This branch changes paths only; it does not rename Python modules or change application behavior.
+The backend entry point is `backend/main.py` and is loaded as `backend.main:app` from the repository root. This allows its relative imports to resolve correctly.
