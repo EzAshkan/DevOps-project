@@ -1,0 +1,7 @@
+---
+- name: Configure Gitlab Runner
+  hosts: deveops_server
+  becaom: true
+
+  roles: 
+    - gitlab_runner
