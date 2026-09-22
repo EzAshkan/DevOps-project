@@ -22,3 +22,4 @@ frontend/dist/
 .vscode/
 .idea/
 >>>>>>> origin/develop
+ansible/inventory.ini
