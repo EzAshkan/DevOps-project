@@ -1,4 +1,4 @@
-# Copy this file to inventory.ini and fill in real values.
-# inventory.ini itself is gitignored — never commit real credentials.
+# Copy this file to devops-server.ini and fill in real values.
+# devops-server.ini is gitignored — never commit real infrastructure details.
 [devops_server]
-forogh ansible_host=95.38.235.253 ansible_user=MohammadReza ansible_ssh_private_key_file=~/.ssh/id_ed25519
+forogh ansible_host=YOUR_SERVER_IP ansible_user=YOUR_SERVER_USER ansible_ssh_private_key_file=~/.ssh/id_ed25519

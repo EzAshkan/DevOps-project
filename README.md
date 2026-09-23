@@ -6,6 +6,10 @@ Repository, team, local-development, and infrastructure guidance is in [docs/](d
 
 For Ubuntu setup and the verified local commands, see [Local development](docs/local-development.md).
 
+## Infrastructure automation
+
+The shared GitLab Runner Ansible role, inventory guidance, and run commands are documented in [ansible/README.md](ansible/README.md).
+
 | Component | Technology | Location |
 |-----------|------------|----------|
 | Backend   | Python 3.11+ / FastAPI / SQLAlchemy | `backend/` |
