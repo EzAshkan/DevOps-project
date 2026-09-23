@@ -1,0 +1,11 @@
+stage:
+  - verify
+
+verify_docker_runner:
+  stage: verify
+  image: docker:29:8.1-cli
+  tags:
+    - docker-ci
+  script:
+    - docker version
+    - docker info   
