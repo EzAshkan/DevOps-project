@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 .env
 =======
 # Python
@@ -21,5 +21,6 @@ frontend/dist/
 .DS_Store
 .vscode/
 .idea/
->>>>>>> origin/develop
 ansible/inventory.ini
+ansible/inventory/*.ini
+!ansible/inventory/*.ini.example

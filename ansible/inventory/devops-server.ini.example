@@ -1,4 +1,4 @@
 # Copy this file to inventory.ini and fill in real values.
 # inventory.ini itself is gitignored — never commit real credentials.
 [devops_server]
-server ansible_host=YOUR_SERVER_IP ansible_user=ansible ansible_become=true
+forogh ansible_host=95.38.235.253 ansible_user=MohammadReza ansible_ssh_private_key_file=~/.ssh/id_ed25519
