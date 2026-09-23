@@ -1,4 +1,4 @@
-stage:
+stages:
   - verify
 
 verify_docker_runner:
