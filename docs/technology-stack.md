@@ -8,8 +8,8 @@
 | Cache | Redis | Optional cache support. |
 | Shared server | Forogh provider, Ubuntu 24.04 | Planned shared environment for Minikube and team integration work. |
 | Local orchestration | Docker Compose | Planned local stack. |
-| CI/CD | GitLab CI/CD | Planned testing, image build, and publishing pipeline. |
-| Image registry | GitLab Container Registry or shared Nexus | Planned image storage. |
+| CI/CD | GitLab CI/CD | Backend/frontend lint and test jobs; Docker image build and publish stages are configured. |
+| Image registry | Shared Nexus | Docker Hub proxy for public images and Docker Hosted repository for TaskFlow images. |
 | Orchestration | Kubernetes / Minikube | Planned shared development cluster. |
 | Packaging | Helm | Planned Kubernetes application packaging. |
 | GitOps | Argo CD | Planned Git-driven deployment reconciliation. |
