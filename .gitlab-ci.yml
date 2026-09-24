@@ -3,7 +3,7 @@ stages:
 
 verify_docker_runner:
   stage: verify
-  image: nexus.server:8083/library/docker:29.8.1-cl
+  image: nexus.server:8083/library/docker:29.8.1-cli
   tags:
     - docker-ci
   script:
