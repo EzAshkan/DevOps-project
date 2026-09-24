@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM nexus.server:8083/library/python:3.12-slim
 
 # Python/container runtime settings
 ENV PYTHONDONTWRITEBYTECODE=1 \
