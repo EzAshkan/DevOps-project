@@ -45,6 +45,34 @@ build_backend_image:
     - BACKEND_IMAGE="${NEXUS_HOSTED_REGISTRY}/taskflow/backend:${CI_COMMIT_SHA}"
     - docker build --tag "$BACKEND_IMAGE" backend
     - docker save --output backend.image.tar "$BACKEND_IMAGE"
+  artifacts:
+    paths:
+      - backend-image.tar
+    expire_in: 1 hour
+
+publish_backend_image:
+  stage: publish
+  image: $NEXUS_DOCKERHUB_PROXY/library/docker:29.8.1-cli
+  tags:
+    - docker-ci
+  needs:
+    - job: build_backend_image
+      artifacts: true
+
+  script:
+    - BACKEND_IMAGE=${NEXUS_HOSTED_REGISTRY}/taskflow/backend:${CI_COMMIT_SHA}
+    - docker load --input backend-image.tar
+    - printf '%s' "$NEXUS_PASSWORD" | docker login "$NEXUS_HOSTED_REGISTRY" --username "$NEXUS_USERNAME" --password-stdin
+    - docker push "$BACKEND_IMAGE"
+  when: manual
+
+
+
+
+
+
+
+
 
 
 
