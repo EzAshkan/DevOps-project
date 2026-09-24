@@ -1,12 +1,8 @@
 import logging
 import socket
 import time
-import logging
-import socket
-import time
 import uuid
 from contextlib import asynccontextmanager
-from .logging_config import configure_logging
 
 from fastapi import APIRouter, FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
@@ -17,6 +13,7 @@ from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
 from .cache import check_redis
 from .config import settings
 from .database import check_database, init_db
+from .logging_config import configure_logging
 from .routers import tasks
 from .schemas import HealthResponse
 

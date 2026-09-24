@@ -6,6 +6,10 @@ Repository, team, local-development, and infrastructure guidance is in [docs/](d
 
 For Ubuntu setup and the verified local commands, see [Local development](docs/local-development.md).
 
+## Infrastructure automation
+
+The shared GitLab Runner Ansible role, inventory guidance, and run commands are documented in [ansible/README.md](ansible/README.md).
+
 | Component | Technology | Location |
 |-----------|------------|----------|
 | Backend   | Python 3.11+ / FastAPI / SQLAlchemy | `backend/` |
@@ -65,11 +69,14 @@ Interactive API docs: `http://localhost:8000/docs`
 Tests use a temporary SQLite database and no Redis, so no infrastructure is needed (suitable for the CI test stage):
 
 ```bash
-pip install -r requirements-dev.txt
-cd backend
-ruff check .
-python -m pytest
+python -m pip install -r backend/requirements.txt ruff pytest httpx
+ruff check backend
+python -m pytest backend/tests
 ```
+
+For Ruff errors marked as fixable, use `ruff check backend --fix`, inspect the
+diff, and rerun lint and tests before committing. CI reports these errors; it
+does not modify source files for you.
 
 ### API
 

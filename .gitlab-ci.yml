@@ -1,0 +1,103 @@
+stages:
+  - test
+  - build
+  - publish
+
+
+variables:
+  DOCKER_BUILDKIT: "1"
+
+  #Nexus repository end points
+
+  NEXUS_DOCKERHUB_PROXY: nexus.server:8083
+  NEXUS_HOSTED_REGISTRY: nexus.server:8082
+
+  BACKEND_IMAGE: $NEXUS_HOSTED_REGISTRY/taskflow/backend:$CI_COMMIT_SHA
+  FRONTEND_IMAGE: $NEXUS_HOSTED_REGISTRY/taskflow/frontend:$CI_COMMIT_SHA
+
+backend_lint_test:
+  stage: test
+  image: $NEXUS_DOCKERHUB_PROXY/library/python:3.12-slim
+  tags:
+    - docker-ci
+  script:
+    - python -m pip install --no-cache-dir -r backend/requirements.txt ruff pytest httpx
+    - test -e Back || ln -s backend Back
+    - ruff check backend
+    - python -m pytest backend/tests
+
+frontend_lint_test:
+  stage: test
+  image: $NEXUS_DOCKERHUB_PROXY/library/node:22-alpine
+  tags:
+    - docker-ci
+  script:
+    - cd frontend
+    - npm ci
+    - npm run lint
+    - npm test
+
+build_backend_image:
+  stage: build
+  image: $NEXUS_DOCKERHUB_PROXY/library/docker:29.8.1-cli
+  tags:
+    - docker-ci
+  script:
+    - docker build --tag "$BACKEND_IMAGE" backend
+    - docker save --output backend-image.tar "$BACKEND_IMAGE"
+    - ls -lh backend-image.tar
+  artifacts:
+    paths:
+      - backend-image.tar
+    expire_in: 1 hour
+
+publish_backend_image:
+  stage: publish
+  image: $NEXUS_DOCKERHUB_PROXY/library/docker:29.8.1-cli
+  tags:
+    - docker-ci
+  needs:
+    - job: build_backend_image
+      artifacts: true
+
+  script:
+    - ls -lah
+    - docker load --input backend-image.tar
+    - printf '%s' "$NEXUS_PASSWORD" | docker login "$NEXUS_HOSTED_REGISTRY" --username "$NEXUS_USERNAME" --password-stdin
+    - docker push "$BACKEND_IMAGE"
+
+build_frontend_image:
+  stage: build
+  image: $NEXUS_DOCKERHUB_PROXY/library/docker:29.8.1-cli
+  tags:
+    - docker-ci
+  script:
+    - docker build --tag "$FRONTEND_IMAGE" frontend
+    - docker save --output frontend-image.tar "$FRONTEND_IMAGE"
+  artifacts:
+    paths:
+      - frontend-image.tar
+    expire_in: 1 hour
+
+publish_frontend_image:
+  stage: publish
+  image: $NEXUS_DOCKERHUB_PROXY/library/docker:29.8.1-cli
+  tags:
+    - docker-ci
+  needs:
+    - job: build_frontend_image
+      artifacts: true
+  script:
+    - docker load --input frontend-image.tar
+    - printf '%s' "$NEXUS_PASSWORD" | docker login "$NEXUS_HOSTED_REGISTRY" --username "$NEXUS_USERNAME" --password-stdin
+    - docker push "$FRONTEND_IMAGE"  
+
+
+
+
+
+
+
+
+
+

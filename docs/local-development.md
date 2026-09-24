@@ -49,6 +49,30 @@ export DATABASE_URL="postgresql://taskflow:taskflow_dev_password@localhost:5432/
 python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
 ```
 
+## Backend lint and tests
+
+Run these commands from the repository root. They are the same checks used by
+the CI test job and do not require PostgreSQL or Redis:
+
+```bash
+python -m pip install --no-cache-dir ruff pytest httpx
+ruff check backend
+python -m pytest backend/tests
+```
+
+If Ruff reports fixable formatting or import errors, apply only its safe
+automatic fixes, review the change, then run the checks again:
+
+```bash
+ruff check backend --fix
+git diff
+ruff check backend
+python -m pytest backend/tests
+```
+
+Do this locally and commit the resulting source changes. The CI pipeline should
+report lint errors, not silently fix them in its temporary job workspace.
+
 ## Verification
 
 In another terminal:
