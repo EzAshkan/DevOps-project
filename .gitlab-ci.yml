@@ -1,11 +1,26 @@
 stages:
-  - verify
+  - test
+  - build
+  - publish
 
-verify_docker_runner:
-  stage: verify
-  image: nexus.server:8083/library/docker:29.8.1-cli
+variables:
+  DOCKER_BUILDKIT: "1"
+
+  #Nexus repository end points
+
+  NEXUS_DOCKERHUB_PROXY: nexus.server:8083
+  NEXUS_HOSTED_REGISTRY: nexus.server:8082
+
+  BACKEND_IMAGE: $NEXUS_HOSTED_REGISTRY/taskflow/backend:$CI_COMMIT_SHA
+  FRONTEND_IMAGE: $NEXUS_HOSTED_REGISTRY/taskflow/frontend:$CI_COMMIT_SHA
+
+backend_lint_test:
+  stage: test
+  image: $NEXUS_DOCKERHUB_PROXY/library/python:3.12-slim
   tags:
     - docker-ci
   script:
-    - docker version
-    - docker info   
+    - python -m pip install --no-cache-dir backend/requirements.txt ruff pytest httpx
+    - test -e Back || ln -s backend Back
+    - ruff check backend
+    - python -m pytest backend/tests
