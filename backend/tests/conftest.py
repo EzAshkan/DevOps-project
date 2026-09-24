@@ -15,10 +15,9 @@ os.environ["DB_CONNECT_RETRIES"] = "1"
 # Make the "Back" package importable when pytest runs from any directory
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from fastapi.testclient import TestClient  # noqa: E402
-
 from Back.database import Base, engine  # noqa: E402
 from Back.main import app  # noqa: E402
+from fastapi.testclient import TestClient  # noqa: E402
 
 
 @pytest.fixture()

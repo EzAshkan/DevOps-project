@@ -1,4 +1,0 @@
-# Copy this file to inventory.ini and fill in real values.
-# inventory.ini itself is gitignored — never commit real credentials.
-[devops_server]
-server ansible_host=YOUR_SERVER_IP ansible_user=root ansible_become=true
