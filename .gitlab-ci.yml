@@ -20,7 +20,7 @@ backend_lint_test:
   tags:
     - docker-ci
   script:
-    - python -m pip install --no-cache-dir backend/requirements.txt ruff pytest httpx
+    - python -m pip install --no-cache-dir -r backend/requirements.txt ruff pytest httpx
     - test -e Back || ln -s backend Back
     - ruff check backend
     - python -m pytest backend/tests
