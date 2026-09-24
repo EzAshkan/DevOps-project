@@ -27,7 +27,7 @@ backend_lint_test:
 
 frontend_lint_test:
   stage: test
-  image: $NEXUS_DOCKERHUB_PROXY/library/python:3.12-slim
+  image: $NEXUS_DOCKERHUB_PROXY/library/node:22-alpine
   tags:
     - docker-ci
   script:
