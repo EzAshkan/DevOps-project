@@ -2,7 +2,7 @@
 
 Application layer of the DevOps Bootcamp final project.
 
-Repository, team, local-development, and infrastructure guidance is in [docs/](docs/), including the [shared Forogh server record](docs/infrastructure/shared-forogh-server.md).
+Repository, team, local-development, and infrastructure guidance is in [docs/](docs/), including the [shared Forogh server record](docs/infrastructure/shared-forogh-server.md) and [CI/CD pipeline guide](docs/ci-cd.md).
 
 For Ubuntu setup and the verified local commands, see [Local development](docs/local-development.md).
 
@@ -69,14 +69,16 @@ Interactive API docs: `http://localhost:8000/docs`
 Tests use a temporary SQLite database and no Redis, so no infrastructure is needed (suitable for the CI test stage):
 
 ```bash
+source .venv/bin/activate
 python -m pip install -r backend/requirements.txt ruff pytest httpx
 ruff check backend
 python -m pytest backend/tests
 ```
 
-For Ruff errors marked as fixable, use `ruff check backend --fix`, inspect the
-diff, and rerun lint and tests before committing. CI reports these errors; it
-does not modify source files for you.
+Ruff is a project tool: install it in `.venv`, rather than system-wide with
+Snap. For Ruff errors marked as fixable, use `ruff check backend --fix`, inspect
+the diff, and rerun lint and tests before committing. CI reports these errors;
+it does not modify source files for you.
 
 ### API
 

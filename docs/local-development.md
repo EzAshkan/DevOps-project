@@ -55,13 +55,18 @@ Run these commands from the repository root. They are the same checks used by
 the CI test job and do not require PostgreSQL or Redis:
 
 ```bash
+source .venv/bin/activate
 python -m pip install --no-cache-dir ruff pytest httpx
 ruff check backend
 python -m pytest backend/tests
 ```
 
-If Ruff reports fixable formatting or import errors, apply only its safe
-automatic fixes, review the change, then run the checks again:
+Ruff is installed in `.venv`, not with `sudo snap install ruff`. This keeps the
+developer tool isolated from Ubuntu's system Python and makes its version easy
+to align with CI.
+
+We resolved the reported fixable Ruff errors with the following workflow. Apply
+only its safe automatic fixes, review the change, then run the checks again:
 
 ```bash
 ruff check backend --fix
