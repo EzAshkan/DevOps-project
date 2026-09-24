@@ -43,7 +43,7 @@ build_backend_image:
     - docker-ci
   script:
     - docker build --tag "$BACKEND_IMAGE" backend
-    - docker save --output backend.image.tar "$BACKEND_IMAGE"
+    - docker save --output backend-image.tar "$BACKEND_IMAGE"
     - ls -lh backend-image.tar
   artifacts:
     paths:
