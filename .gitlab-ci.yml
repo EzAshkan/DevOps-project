@@ -42,7 +42,6 @@ build_backend_image:
   tags:
     - docker-ci
   script:
-    - BACKEND_IMAGE="${NEXUS_HOSTED_REGISTRY}/taskflow/backend:${CI_COMMIT_SHA}"
     - docker build --tag "$BACKEND_IMAGE" backend
     - docker save --output backend.image.tar "$BACKEND_IMAGE"
   artifacts:
@@ -60,7 +59,6 @@ publish_backend_image:
       artifacts: true
 
   script:
-    - BACKEND_IMAGE=${NEXUS_HOSTED_REGISTRY}/taskflow/backend:${CI_COMMIT_SHA}
     - docker load --input backend-image.tar
     - printf '%s' "$NEXUS_PASSWORD" | docker login "$NEXUS_HOSTED_REGISTRY" --username "$NEXUS_USERNAME" --password-stdin
     - docker push "$BACKEND_IMAGE"
@@ -71,7 +69,7 @@ build_frontend_image:
     - docker-ci
   script:
     - docker build --tag "$FRONTEND_IMAGE" frontend
-    - docker save --output frontend-image.tar "$FRONTENT_IMAGE"
+    - docker save --output frontend-image.tar "$FRONTEND_IMAGE"
   artifacts:
     paths:
       - frontend-image.tar
