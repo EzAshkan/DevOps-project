@@ -2,7 +2,7 @@ global:
   existingSecret: taskflow-secrets
 
 backend:
-  replicaCount: 2
+  replicaCount: 3
   image:
     repository: nexus.server:8082/taskflow-backend
     tag: "a20725d36ee07d154296c13c3d2e60711e3ea5bf"
