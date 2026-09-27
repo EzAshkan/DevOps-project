@@ -84,3 +84,10 @@ config:
   DB_RETRY_DELAY_SECONDS: "3"
   LOG_LEVEL: "INFO"
   APP_VERSION: "1.0.0"
+
+ingress:
+  enabled: true
+  className: traefik
+  host: ""
+  path: /
+  pathType: Prefix
