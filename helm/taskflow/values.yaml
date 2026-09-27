@@ -5,7 +5,7 @@ backend:
   replicaCount: 2
   image:
     repository: nexus.server:8082/taskflow-backend
-    tag: "49afb5128219f58708dd504edae9edd05dbf5e7c"
+    tag: "51f1dd5144dbc3ecf4df5f5883fdfc5eea344a1b"
     pullPolicy: IfNotPresent
   service:
     port: 8000
@@ -26,7 +26,7 @@ frontend:
   replicaCount: 2
   image:
     repository: nexus.server:8082/taskflow-frontend
-    tag: "49afb5128219f58708dd504edae9edd05dbf5e7c"
+    tag: "51f1dd5144dbc3ecf4df5f5883fdfc5eea344a1b"
     pullPolicy: IfNotPresent
   service:
     port: 8080
