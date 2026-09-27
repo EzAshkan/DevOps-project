@@ -36,10 +36,10 @@ frontend:
       memory: 64Mi
     limits:
       cpu: 250m
-      memory: 256Mi
+      memory: 512Mi
   vpa:
     enabled: true
-    updateMode: "Off"
+    updateMode: "Auto"
 
 postgres:
   replicaCount: 1
