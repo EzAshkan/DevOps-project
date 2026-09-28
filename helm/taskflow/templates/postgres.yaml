@@ -3,7 +3,7 @@ kind: StatefulSet
 metadata:
   name: postgres
 spec:
-  serviceName: postgres
+  serviceName: postgres-headless
   replicas: {{ .Values.postgres.replicaCount }}
   selector:
     matchLabels:
