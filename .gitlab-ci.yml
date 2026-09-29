@@ -129,8 +129,8 @@ update_gitops:
     - publish_backend_image
     - publish_frontend_image
   rules:
-    - when: never
-    # - if: '$CI_COMMIT_BRANCH == "feature/kuber-cluster"'
+    # - when: never
+    - if: '$CI_COMMIT_BRANCH == "feature/kuber-cluster"'
   before_script:
     - apk add --no-cache git
   script:
