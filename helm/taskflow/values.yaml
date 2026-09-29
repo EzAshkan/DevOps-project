@@ -96,6 +96,6 @@ config:
 ingress:
   enabled: true
   className: traefik
-  host: ""
+  host: "taskflow.local"
   path: /
   pathType: Prefix

@@ -1,0 +1,55 @@
+services:
+  elasticsearch:
+    image: elasticsearch:9.2.1
+    restart: unless-stopped
+
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms768m -Xmx768m
+
+    mem_limit: 2g
+
+    ports:
+      - "10.10.20.1:9200:9200"
+
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+
+    networks:
+      - logging
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - curl -fsS http://localhost:9200/_cluster/health || exit 1
+      interval: 15s
+      timeout: 10s
+      retries: 20
+      start_period: 60s
+
+  kibana:
+    image: kibana:9.2.1
+    restart: unless-stopped
+
+    environment:
+      ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
+
+    mem_limit: 1g
+
+    ports:
+      - "127.0.0.1:5601:5601"
+
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+    networks:
+      - logging
+
+volumes:
+  elasticsearch_data:
+
+networks:
+  logging:
+    driver: bridge

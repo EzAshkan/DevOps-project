@@ -1,0 +1,53 @@
+name: taskflow-monitoring
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.55.0
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=7d
+      - --storage.tsdb.retention.size=2GB
+      - --web.enable-lifecycle
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/rules:/etc/prometheus/rules:ro
+      - prometheus-data:/prometheus
+      - ./prometheus/secrets/kubernetes-ca.crt:/etc/prometheus/secrets/kubernetes-ca.crt:ro
+      - ./prometheus/secrets/kubernetes.token:/etc/prometheus/secrets/kubernetes.token:ro
+    mem_limit: 512m
+    cpus: 0.5
+
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    restart: unless-stopped
+    ports:
+      - "9093:9093"
+    command:
+      - --config.file=/etc/alertmanager/alertmanager.yml
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    mem_limit: 128m
+    cpus: 0.25
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?Set password in .env}
+    volumes:
+      - grafana-data:/var/lib/grafana
+    mem_limit: 384m
+    cpus: 0.5
+    depends_on:
+      - prometheus
+
+volumes:
+  prometheus-data:
+  grafana-data:

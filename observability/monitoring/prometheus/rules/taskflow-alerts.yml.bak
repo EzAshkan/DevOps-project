@@ -1,0 +1,33 @@
+groups:
+  - name: taskflow-alerts
+    rules:
+      - alert: TaskFlowReplicasMissing
+        expr: |
+          kube_deployment_spec_replicas{namespace="taskflow"}
+          >
+          on(namespace, deployment)
+          kube_deployment_status_replicas_available{namespace="taskflow"}
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "TaskFlow deployment has missing replicas"
+          description: "{{ $labels.deployment }} has fewer available replicas than desired."
+
+      - alert: TaskFlowContainerRestarts
+        expr: |
+          increase(kube_pod_container_status_restarts_total{namespace="taskflow"}[5m]) > 2
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "TaskFlow container is restarting"
+          description: "Container {{ $labels.container }} in pod {{ $labels.pod }} restarted repeatedly."
+
+      - alert: TaskFlowTestAlert
+        expr: vector(1)
+        for: 30s
+        labels:
+          severity: info
+        annotations:
+          summary: "Prometheus to Alertmanager integration test"
