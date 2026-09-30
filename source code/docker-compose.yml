@@ -107,7 +107,7 @@ services:
     restart: unless-stopped
 
     ports:
-      - "8080:8080"
+      - "8098:8080"
 
     depends_on:
       backend:
