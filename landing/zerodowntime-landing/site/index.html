@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>zerodowntime · Taskflow</title>
+<link rel="stylesheet" href="fonts.css">
+<style>
+:root{--bg1:#E6EDF0;--bg2:#BFD0D8;--ink:#16222E;--mute:#526373;--card:rgba(255,255,255,.86);--line:rgba(22,34,46,.18);--water:#8FB2C4;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg1:#1B2E3D;--bg2:#09121A;--ink:#E6EEF3;--mute:#9FB2C0;--card:rgba(13,25,35,.84);--line:rgba(230,238,243,.2);--water:#0F2636}}
+:root[data-theme="dark"]{--bg1:#1B2E3D;--bg2:#09121A;--ink:#E6EEF3;--mute:#9FB2C0;--card:rgba(13,25,35,.84);--line:rgba(230,238,243,.2);--water:#0F2636}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));color:var(--ink);font-family:Sora,system-ui,-apple-system,"Segoe UI",sans-serif}
+#gl{position:fixed;inset:0;width:100%;height:100%;display:block}
+.hero{position:fixed;left:clamp(20px,5vw,72px);top:calc(env(safe-area-inset-top,0px) + 9vh);max-width:min(560px,90vw);pointer-events:none}
+.hero h1{margin:0;font-size:clamp(42px,8vw,104px);font-weight:800;letter-spacing:-.045em;line-height:.93}
+.hero p{margin:16px 0 0;color:var(--mute);font-size:clamp(15px,1.9vw,19px);max-width:32ch;line-height:1.45}
+.card{position:fixed;right:clamp(14px,4vw,56px);top:50%;transform:translateY(-50%);width:min(390px,calc(100vw - 28px));padding:24px;border:1px solid var(--line);border-radius:14px;background:var(--card);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.k{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--mute);font-weight:600}
+.own{display:flex;align-items:center;gap:8px}.own i{width:11px;height:11px;border-radius:3px;background:var(--line)}
+.date{margin-top:16px;font-size:13px;color:var(--mute)}
+.card h2{margin:4px 0 10px;font-size:clamp(24px,3vw,32px);line-height:1.08;letter-spacing:-.025em;font-weight:800}
+.card p{margin:0;line-height:1.55;color:var(--mute);font-size:15px;min-height:4.6em}
+.card.sw>.date,.card.sw>h2,.card.sw>p{animation:sw .4s both}
+@keyframes sw{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.nav{display:flex;gap:8px;margin-top:18px}
+.nav button{flex:1;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:transparent;color:var(--ink);font:600 14px Sora,system-ui,sans-serif;cursor:pointer}
+.nav button:hover{background:var(--line)}
+button:focus-visible,.btn:focus-visible{outline:3px solid #2F52B8;outline-offset:3px}
+.man{margin-top:18px;padding-top:14px;border-top:1px solid var(--line);display:grid;gap:8px}
+.man div{display:flex;align-items:center;gap:10px;font-size:13px}
+.man i{width:10px;height:10px;border-radius:3px}
+.man .sq{display:flex;gap:3px;margin-left:auto}.man .sq u{width:14px;height:8px;border-radius:2px;background:var(--line);text-decoration:none}
+.man .sq u.on{background:var(--c)}
+.cta{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 28px);transform:translateX(-50%);width:min(520px,calc(100vw - 28px));padding:24px;text-align:center;border:1px solid var(--line);border-radius:16px;background:var(--card);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);opacity:0;pointer-events:none}
+.cta h2{margin:0 0 8px;font-size:clamp(22px,3.4vw,30px);line-height:1.1;letter-spacing:-.025em;font-weight:800}
+.cta p{margin:0 0 18px;color:var(--mute);line-height:1.5}
+.btn{display:inline-block;padding:14px 30px;border-radius:12px;background:var(--ink);color:var(--bg1);font-weight:700;font-size:16px;text-decoration:none}
+.btn:hover{opacity:.88}
+@media (max-width:760px){.card{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);transform:none;right:14px;padding:18px}.man{display:none}.card p{min-height:0}}
+@media (prefers-reduced-motion:reduce){.card.sw>*{animation:none}}
+.crew{margin-top:24px;display:grid;gap:10px;max-width:440px}
+.crew div{display:flex;gap:12px;align-items:flex-start;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.crew i{width:11px;height:11px;border-radius:3px;margin-top:5px;flex:none}
+.crew b{display:block;font-size:15px}.crew span{display:block;font-size:12.5px;color:var(--mute);line-height:1.4;margin-top:2px}
+@media (max-width:760px){.crew span.d{display:none}.crew{gap:6px}.hero p{display:none}}
+</style>
+</head>
+<body>
+<canvas id="gl" aria-hidden="true"></canvas>
+<div id="spacer"></div>
+<section class="hero" id="hero"><h1>Taskflow, shipped end to end.</h1><p>zerodowntime: three engineers took it from source code to a running cluster.</p><div class="crew" id="crew"></div></section>
+<aside class="card" id="card">
+  <div class="k"><span id="cnt"></span><span class="own"><i id="od"></i><span id="on"></span></span></div>
+  <div class="date" id="dt"></div><h2 id="tt"></h2><p id="tx"></p>
+  <div class="nav"><button id="pv">Previous</button><button id="nx">Next container</button></div>
+  <div class="man" id="man"></div>
+</aside>
+<section class="cta" id="cta">
+  <h2>Taskflow is loaded and cleared to sail.</h2>
+  <p>Every stage is in place. Go see it running.</p>
+  <a class="btn" id="go" href="#" target="_blank" rel="noopener">Open Taskflow</a>
+</section>
+
+<script src="three.min.js"></script>
+<script>
+/* ===== EDIT: app link, team, events ===== */
+const APP_URL="https://app.zerodowntime.ir";
+const TEAM=[
+ {name:"Zahra",role:"Kubernetes & delivery lead",duty:"Cluster design, Taskflow deployment, end-to-end story"},
+ {name:"MohammadReza",role:"CI/CD & GitOps engineer",duty:"Git workflow, GitLab CI, SonarQube, Helm, Argo CD, HPA/VPA"},
+ {name:"Ashkan",role:"Platform & operations engineer",duty:"Server setup, Ansible, Traefik, Nexus, monitoring, Velero backups"}
+];
+const EVENTS=[
+ {date:"Automation",title:"Ansible automation",text:"Ansible roles and inventory standardize server setup and Kubernetes prerequisites, so the environment can be rebuilt the same way every time.",who:2},
+ {date:"CI",title:"GitLab CI pipeline",text:"Test, build and publish stages with Ruff, Pytest, ESLint and Vitest. A six-job run passed with 17 backend and 11 frontend tests.",who:1},
+ {date:"Registry",title:"Private Nexus registry",text:"Frontend and backend images are published to our own Nexus Docker registry and versioned by Git commit SHA.",who:2},
+ {date:"Infrastructure",title:"3-node Kubernetes cluster",text:"Debian 13 VMs: one control plane and two workers, built with kubeadm v1.36.4, containerd, Cilium and local-path storage.",who:0},
+ {date:"Deployment",title:"Taskflow on Kubernetes",text:"Namespace taskflow: frontend and backend (2 replicas each), PostgreSQL and Redis with persistent volumes, Services, ConfigMap and Secrets.",who:0},
+ {date:"Release",title:"Helm chart and release",text:"A custom chart that references existing Secrets and PVCs instead of recreating them. Linted, dry-run, installed, then health-checked.",who:1},
+ {date:"GitOps",title:"Argo CD and GitOps",text:"Argo CD compares Git with the live cluster. Flow: GitLab, CI, Nexus, GitOps repo, Argo CD, Kubernetes. Automated sync is still being validated.",who:1},
+ {date:"Scale and update",title:"HPA, VPA, rolling updates",text:"Autoscaling and progressive rollouts keep Taskflow available while it changes. Results are shown only with real metrics.",who:1},
+ {date:"Observability",title:"Monitoring and logging",text:"Prometheus, Grafana, Node Exporter and VictoriaMetrics for metrics, Fluent Bit for logs, and Traefik in front of the app.",who:2},
+ {date:"Reliability",title:"Backups and recovery",text:"PostgreSQL and Redis backed up with Velero support. The PostgreSQL backup was restored into a separate test database to prove recovery.",who:2},
+ {date:"Lessons",title:"Real-world challenges",text:"Fixed import paths and Docker contexts, debugged CI failures, adopted existing PVCs into Helm, and chased PostgreSQL restarts.",who:0}
+];
+/* ====================================== */
+const COL=["#2F52B8","#E3A620","#178F8A"];
+const N=EVENTS.length,$=id=>document.getElementById(id);
+const LZ=[-2.4,0,2.4],CH=1.95,clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v));
+$("go").href=APP_URL;
+$("crew").innerHTML=TEAM.map((m,i)=>`<div><i style="background:${COL[i]}"></i><p style="margin:0"><b>${m.name} <span style="display:inline">· ${m.role}</span></b><span class="d">${m.duty}</span></p></div>`).join("");
+$("spacer").style.height=((N+3)*90)+"vh";
+const maxS=()=>document.documentElement.scrollHeight-innerHeight;
+const toEvent=i=>scrollTo({top:maxS()*(i+1.35)/(N+2),behavior:"smooth"});
+let A=-1;
+$("nx").onclick=()=>A>=N-1?scrollTo({top:maxS(),behavior:"smooth"}):toEvent(A+1);
+$("pv").onclick=()=>A<=0?scrollTo({top:0,behavior:"smooth"}):toEvent(A-1);
+
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+let R=null;try{R=new THREE.WebGLRenderer({canvas:$("gl"),antialias:true,alpha:true});R.setPixelRatio(Math.min(devicePixelRatio,2))}catch(e){}
+const still=matchMedia("(prefers-reduced-motion:reduce)").matches;
+let scene,cam,items=[],fleet,hi,cable,water,wake,puffs=[],drawAll=[];
+function paint(cv,color,title,idx){
+  const x=cv.getContext("2d");x.fillStyle=color;x.fillRect(0,0,512,200);
+  x.fillStyle="rgba(0,0,0,.2)";for(let i=0;i<512;i+=16)x.fillRect(i,0,6,200);
+  x.fillStyle="rgba(255,255,255,.93)";x.fillRect(30,64,452,84);
+  x.fillStyle="#16222E";let s=36;x.textBaseline="middle";
+  do{x.font="700 "+s+"px Sora,sans-serif";s-=2}while(x.measureText(title).width>410&&s>14);
+  x.fillText(title,48,106);
+  x.font="600 20px Sora,sans-serif";x.fillStyle="rgba(255,255,255,.95)";x.fillText("ZDT-"+String(idx+1).padStart(3,"0"),32,32);
+}
+const lam=c=>new THREE.MeshLambertMaterial({color:c});
+if(R){
+  scene=new THREE.Scene();scene.fog=new THREE.Fog(0xffffff,45,150);
+  cam=new THREE.PerspectiveCamera(40,1,.1,300);
+  scene.add(new THREE.AmbientLight(0xffffff,.75));
+  const dl=new THREE.DirectionalLight(0xffffff,.8);dl.position.set(8,18,10);scene.add(dl);
+  water=new THREE.Mesh(new THREE.PlaneGeometry(600,600),new THREE.MeshBasicMaterial({color:0x8FB2C4}));
+  water.rotation.x=-Math.PI/2;water.position.y=-1.2;scene.add(water);
+  wake=new THREE.Mesh(new THREE.PlaneGeometry(1,5),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.45}));
+  wake.rotation.x=-Math.PI/2;wake.position.y=-1.15;scene.add(wake);
+  fleet=new THREE.Group();scene.add(fleet);
+  // ship: hull, bridge, funnel
+  const sh=new THREE.Shape();sh.moveTo(-10,-4.2);sh.lineTo(6,-4.2);sh.lineTo(12,0);sh.lineTo(6,4.2);sh.lineTo(-10,4.2);sh.closePath();
+  const hg=new THREE.ExtrudeGeometry(sh,{depth:2.4,bevelEnabled:false});hg.rotateX(-Math.PI/2);hg.translate(0,-2.4,0);
+  fleet.add(new THREE.Mesh(hg,[lam(0x5A6B7B),lam(0x22303F)]));
+  const br=new THREE.Mesh(new THREE.BoxGeometry(3,3.4,7.6),lam(0xE9EEF2));br.position.set(-7.6,1.7,0);fleet.add(br);
+  const win=new THREE.Mesh(new THREE.BoxGeometry(.06,.7,6.6),new THREE.MeshBasicMaterial({color:0xFFD37A}));win.position.set(-6.07,2.5,0);fleet.add(win);
+  const fn=new THREE.Mesh(new THREE.CylinderGeometry(.75,.9,1.8,14),lam(0xE3A620));fn.position.set(-8.4,4.3,0);fleet.add(fn);
+  for(let i=0;i<4;i++){const p=new THREE.Mesh(new THREE.SphereGeometry(.5,10,8),new THREE.MeshBasicMaterial({color:0x9aa5ae,transparent:true,opacity:.4}));fleet.add(p);puffs.push(p)}
+  // cargo
+  const geo=new THREE.BoxGeometry(4.8,1.9,1.9),cnt=[0,0,0];
+  EVENTS.forEach((e,i)=>{
+    const o=e.who%3,cv=document.createElement("canvas");cv.width=512;cv.height=200;paint(cv,COL[o],e.title,i);
+    const t=new THREE.CanvasTexture(cv);
+    const side=new THREE.MeshLambertMaterial({map:t}),end=lam(new THREE.Color(COL[o]).multiplyScalar(.7)),top=lam(COL[o]);
+    const m=new THREE.Mesh(geo,[end,end,top,top,side,side]);
+    const fy=.98+cnt[o]*CH;cnt[o]++;
+    m.userData={fy,z:LZ[o],lvl:cnt[o]};m.visible=false;fleet.add(m);items.push(m);drawAll.push({cv,t,o,e,i});
+  });
+  hi=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(5,2.1,2.1)),new THREE.LineBasicMaterial({color:0xffffff}));hi.visible=false;fleet.add(hi);
+  cable=new THREE.Mesh(new THREE.BoxGeometry(.06,1,.06),new THREE.MeshBasicMaterial({color:0x888888}));cable.visible=false;fleet.add(cable);
+  document.fonts&&Promise.all([document.fonts.load("700 36px Sora"),document.fonts.load("600 20px Sora")]).then(()=>drawAll.forEach(d=>{paint(d.cv,COL[d.o],d.e.title,d.i);d.t.needsUpdate=true}));
+}
+function theme(){if(!R)return;water.material.color.set(css("--water"));scene.fog.color.set(css("--bg1"))}
+matchMedia("(prefers-color-scheme:dark)").addEventListener("change",()=>setTimeout(theme,50));
+function size(){if(!R)return;const w=innerWidth,h=innerHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}
+addEventListener("resize",size);size();theme();
+
+const ease=t=>1-Math.pow(1-t,3);
+$("man").innerHTML=TEAM.map((m,i)=>`<div><i style="background:${COL[i]}"></i>${m.name}<span class="sq" id="sq${i}" style="--c:${COL[i]}">${EVENTS.filter(e=>e.who%3===i).map(()=>"<u></u>").join("")}</span></div>`).join("");
+function show(a){
+  A=a;const c=$("card"),e=EVENTS[a];
+  $("cnt").textContent=a<0?"Ship at berth":"Container "+(a+1)+" of "+N;
+  $("od").style.background=a<0?"":COL[e.who%3];$("on").textContent=a<0?"":TEAM[e.who%3].name;
+  $("dt").textContent=a<0?"Manifest":e.date;
+  $("tt").textContent=a<0?"Ready to load":e.title;
+  $("tx").textContent=a<0?"Scroll to lower the first container onto the ship.":e.text;
+  c.classList.remove("sw");void c.offsetWidth;c.classList.add("sw");
+  TEAM.forEach((m,o)=>{const own=EVENTS.map((x,i)=>[x,i]).filter(([x])=>x.who%3===o);
+    [...$("sq"+o).children].forEach((u,k)=>u.classList.toggle("on",own[k][1]<=a))});
+  $("nx").textContent=a>=N-1?"Set sail":"Next container";
+}
+show(-1);
+let cur=0,ang=0,ty=1.5;
+function tick(t){
+  const target=clamp(scrollY/Math.max(1,maxS()));
+  cur+=still?(target-cur):(target-cur)*.08;
+  const seg=cur*(N+2)-.5;
+  const dep=clamp((seg-N)/1.5);
+  $("hero").style.opacity=Math.max(0,1-(seg+.5)*2.2);
+  const a=seg<0?-1:Math.min(N-1,Math.floor(seg));
+  if(a!==A)show(a);
+  const co=clamp(1-(seg-(N-.05))/.35);
+  $("card").style.opacity=co;$("card").style.pointerEvents=co<.5?"none":"auto";
+  const ct=clamp((seg-(N+.5))/.6);
+  $("cta").style.opacity=ct;$("cta").style.pointerEvents=ct>.5?"auto":"none";
+  if(R){
+    let dropping=null,top=0;
+    items.forEach((m,i)=>{
+      const l=clamp((seg-i)/.85);
+      m.visible=seg>=i;
+      m.position.set(0,m.userData.fy+(1-ease(l))*16,m.userData.z);
+      if(m.visible)top=Math.max(top,m.userData.lvl);
+      if(l>0&&l<1)dropping=m;
+    });
+    cable.visible=!!dropping;
+    if(dropping){const p=dropping.position;cable.scale.y=40;cable.position.set(p.x,p.y+21,p.z)}
+    const c1=a>=0?items[a]:null;
+    hi.visible=!!c1&&!dropping&&dep<.02;if(c1)hi.position.copy(c1.position);
+    // departure
+    fleet.position.x=Math.pow(dep,2.2)*46;
+    wake.scale.x=dep*38;wake.position.x=fleet.position.x-10-wake.scale.x/2;wake.material.opacity=.45*Math.min(1,dep*4);
+    puffs.forEach((p,i)=>{const k=((t*.00035)+i/4)%1;p.position.set(-8.4-k*3.5,5.4+k*4.5,0);p.scale.setScalar(.6+k*1.8);p.material.opacity=(1-k)*.42});
+    const wide=innerWidth>760,w=innerWidth,h=innerHeight;
+    if(wide)cam.setViewOffset(w,h,w*.12*(1-dep),0,w,h);else cam.clearViewOffset();
+    const tgt=dep>0?3:Math.max(1.5,top*CH*.5);ty+=(tgt-ty)*.06;
+    const tang=-.9+1.5*clamp(seg/N)-.6*dep;
+    ang+=(tang-ang)*(still?1:.08);
+    const rad=((wide?19:24)+top*.8)+dep*12;
+    cam.position.set(Math.sin(ang)*rad,ty+6+top*.5-dep*2,Math.cos(ang)*rad);
+    cam.lookAt(fleet.position.x*.3,ty,0);
+    cam.updateProjectionMatrix();
+    R.render(scene,cam);
+  }
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>

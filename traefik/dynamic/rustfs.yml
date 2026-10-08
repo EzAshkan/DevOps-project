@@ -1,0 +1,27 @@
+http:
+  routers:
+    rustfs:
+      rule: "Host(`bucket.zerodowntime.ir`)"
+      entrypoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+      service: rustfs
+    rustfs-console:
+      rule: "Host(`rustfs.zerodowntime.ir`)"
+      entrypoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+      service: rustfs-console    
+  
+  services:
+    rustfs:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:9100"
+
+    rustfs-console:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:9101"

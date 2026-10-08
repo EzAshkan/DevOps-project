@@ -1,0 +1,16 @@
+http:
+  routers:
+    sonarqube:
+      rule: "Host(`sonar.zerodowntime.ir`)"
+      entrypoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+      service: sonarqube
+ 
+  services:
+    sonarqube:
+      loadBalancer:
+        servers:
+          - url: "http://172.17.0.1:9000"
+ 

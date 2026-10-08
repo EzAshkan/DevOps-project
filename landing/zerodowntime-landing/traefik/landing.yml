@@ -1,0 +1,27 @@
+# Copy to /opt/traefik/dynamic/landing.yml (Traefik watches the folder, no restart needed)
+http:
+  routers:
+    landing:
+      rule: "Host(`zerodowntime.ir`)"
+      entrypoints: [websecure]
+      tls:
+        certResolver: letsencrypt
+      service: landing
+    landing-http:
+      rule: "Host(`zerodowntime.ir`)"
+      entrypoints: [web]
+      middlewares: [to-https]
+      service: landing
+  middlewares:
+    to-https:
+      redirectScheme:
+        scheme: https
+        permanent: true
+  services:
+    landing:
+      loadBalancer:
+        servers:
+          # Kubernetes NodePort (same node IP your app uses):
+          - url: "http://192.168.58.2:30081"
+          # Docker-only alternative (see docker-compose.yml):
+          # - url: "http://127.0.0.1:8081"

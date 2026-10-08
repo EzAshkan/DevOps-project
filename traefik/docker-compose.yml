@@ -1,0 +1,25 @@
+version: "3.8"
+
+volumes:
+  traefik-certs:
+
+services:
+  traefik:
+    image: traefik:v3.5
+    container_name: traefik
+    restart: unless-stopped
+
+    network_mode: host
+
+    command:
+      - --providers.file.directory=/etc/traefik/dynamic
+      - --providers.file.watch=true
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.letsencrypt.acme.tlschallenge=true
+      - --certificatesresolvers.letsencrypt.acme.email=simplyashkan@gmail.com
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+
+    volumes:
+      - traefik-certs:/letsencrypt
+      - ./dynamic:/etc/traefik/dynamic:ro

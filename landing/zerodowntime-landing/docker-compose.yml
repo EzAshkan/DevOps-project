@@ -1,0 +1,8 @@
+# Docker-only option: run on the Traefik server, Traefik reaches it on 127.0.0.1:8081
+services:
+  landing:
+    build: .
+    container_name: landing
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8081:8080"

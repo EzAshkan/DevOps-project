@@ -1,0 +1,62 @@
+http:
+  routers:
+    prometheus:
+      rule: "Host(`prometheus.zerodowntime.ir`)"
+      entrypoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+      service: prometheus
+      middlewares:
+        - prometheus-auth
+
+    grafana:
+      rule: "Host(`grafana.zerodowntime.ir`)"
+      entrypoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+      service: grafana
+
+    app:
+      rule: "Host(`app.zerodowntime.ir`)"
+      entrypoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+      service: app
+
+    argo:
+      rule: "Host(`argo.zerodowntime.ir`)"
+      entrypoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+      service: argo
+
+  services:
+    prometheus:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:9090"
+
+    grafana:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:3000"
+
+    app:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.58.2:30080"
+
+    argo:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.58.2:30080"
+
+  middlewares:
+    prometheus-auth:
+      basicAuth:
+        users:
+          - "prometheus-admin:$apr1$vk2AB3m0$0JTje8fPNol1tjXrXH5Oy"
